@@ -1,0 +1,4 @@
+name: RandomCrits
+version: '${project.version}'
+main: com.segoitch.randomcrits.RandomCrits
+api-version: 1.19
