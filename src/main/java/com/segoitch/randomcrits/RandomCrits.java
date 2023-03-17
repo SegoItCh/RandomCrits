@@ -9,12 +9,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 
 public final class RandomCrits extends JavaPlugin implements Listener {
     private double baseCriticalChance = getConfig().getDouble("baseCriticalChance");
     private double baseCriticalMultiplier = getConfig().getDouble("baseCriticalMultiplier");
+    private boolean bowCritical = false;
     //boolean isAttack = false;
 
     @Override
@@ -40,7 +42,7 @@ public final class RandomCrits extends JavaPlugin implements Listener {
         }
     }*/
 
-    boolean isCritical (Entity damager) {
+    boolean isPlayerAttackCritical(Entity damager) {
         if (damager instanceof Player) {
             Player player = (Player) damager;
             if (damager.getFallDistance() > 0.0F
@@ -59,7 +61,7 @@ public final class RandomCrits extends JavaPlugin implements Listener {
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
 
-        if(Math.random() <= baseCriticalChance && !isCritical(damager)) {
+        if(Math.random() <= baseCriticalChance && !isPlayerAttackCritical(damager) && !bowCritical) {
             event.setDamage(damage);
             damagee.playEffect(EntityEffect.HURT);
             damagee.getWorld().spawnParticle(Particle.CRIT, damagee.getLocation(), 16);
@@ -67,4 +69,15 @@ public final class RandomCrits extends JavaPlugin implements Listener {
         }
     }
 
+    @EventHandler
+    public void onBowShoot(EntityShootBowEvent event) {
+        if (event.getEntity() instanceof Player) {
+            if(event.getForce() >= 1) {
+                bowCritical = true;
+            }
+        }
+        else {
+            bowCritical = false;
+        }
+    }
 }
